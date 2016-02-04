@@ -14,7 +14,7 @@ class aCP2Cell: UITableViewCell {
     
     @IBOutlet weak var addCollegeBlueButton : UIButton!
      
-    
+     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
