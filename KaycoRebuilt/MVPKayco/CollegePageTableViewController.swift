@@ -37,6 +37,11 @@ class CollegePageTableViewController: UITableViewController, UINavigationControl
     @IBOutlet var locationLabel: UILabel!
     
     
+    //Wiki Description Cell
+    @IBOutlet var wikiLabel: UILabel!
+    
+    
+    
     //Cell2(AddCollege)
     @IBOutlet var addCollegeBlueButton: UIButton!
     
@@ -115,6 +120,13 @@ class CollegePageTableViewController: UITableViewController, UINavigationControl
             super.viewDidLoad()
             queryACollege()
             
+            
+//            self.navigationController!.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Helvetica", size: 17)!]
+            UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+            self.navigationController!.navigationBar.titleTextAttributes = [NSFontAttributeName: UIFont(name: "Arial Rounded MT Bold", size: 15)!, NSForegroundColorAttributeName : UIColor.whiteColor()]
+
+            
+            
             // EventsButton
             self.eventsGrayButton.layer.cornerRadius = 8
             self.eventsGrayButton.layer.shadowOpacity = 0.6
@@ -149,7 +161,8 @@ class CollegePageTableViewController: UITableViewController, UINavigationControl
             iconIMGView.layer.shadowOpacity = 0.7
             iconIMGView.layer.shadowOffset = CGSize(width: 0, height: 2)
             
-
+            //Wiki Label
+            wikiLabel.layer.cornerRadius = 8
             
             
             print(beef)
@@ -167,6 +180,7 @@ class CollegePageTableViewController: UITableViewController, UINavigationControl
             
             if aCollege != nil{
                 self.title = "\(aCollege!)"
+                
             }
             // Do any additional setup after loading the view.
         }
@@ -177,7 +191,16 @@ class CollegePageTableViewController: UITableViewController, UINavigationControl
             Verify()
         }
         
-        
+    
+    @IBAction func dismissVC(sender: AnyObject) {
+        print("Dissmissing")
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    
+    
+    
+    
         func checkup(){
             var myColleges = [String]()
             let (resultSet, err) = SD.executeQuery("SELECT * FROM myNColleges")
@@ -409,7 +432,7 @@ class CollegePageTableViewController: UITableViewController, UINavigationControl
 
     
         override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-            return 7
+            return 8
         }
     
     /*
@@ -441,8 +464,19 @@ class CollegePageTableViewController: UITableViewController, UINavigationControl
             vc.aCollege = self.aCollege!
             vc.iconIMG = self.iconIMGView.image!
         }
-        if segue.identifier == ""{
+        if segue.identifier == "WikiD"{
+            let vvc : WikiNavi = segue.destinationViewController as! WikiNavi
             
+            let vc = vvc.viewControllers.first as! WikiDescriptionTVC
+            
+            vc.College = self.aCollege!
+            if self.wikiLabel.text != nil{
+                vc.CollegeDescription = self.wikiLabel.text!
+            }else{
+                vc.CollegeDescription = "Network Error..."
+            }
+//            vc.CollegeDescription = self.wikiLabel.text
+            vc.collegeIcon = self.icon
         }
     }
         
