@@ -17,6 +17,8 @@ class SuggestedCollegesVC: UIViewController, UICollectionViewDataSource, UIColle
     // transfer
     var theState : String?
     
+    var colleges = [CollegeObject]()
+    
     @IBOutlet var collectionview: UICollectionView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,20 +37,21 @@ class SuggestedCollegesVC: UIViewController, UICollectionViewDataSource, UIColle
     
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return cNarray.count
+        return colleges.count //cNarray.count
+        
     }
     
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell : sugCell = collectionView.dequeueReusableCellWithReuseIdentifier("sugCell", forIndexPath: indexPath) as! sugCell
         
-        cell.cNameLabel.text = self.cNarray[indexPath.row]
-        cell.fileholder = self.cIarray[indexPath.row]
+        cell.cNameLabel.text = self.colleges[indexPath.row].name//self.cNarray[indexPath.row]
+        cell.fileholder = self.colleges[indexPath.row].IconIMGFile//self.cIarray[indexPath.row]
         
         cell.fileholder?.getDataInBackgroundWithBlock({ (theData : NSData?, error:NSError?) -> Void in
             let image = UIImage(data: theData!)
             self.AIarray.append(image!)
-
+            self.colleges[indexPath.row].Icon = image!
             cell.iconIMGView.image = image!
         })
         return cell
@@ -68,18 +71,28 @@ class SuggestedCollegesVC: UIViewController, UICollectionViewDataSource, UIColle
             if error == nil{
                 if let results = results as [PFObject]?{
                     for result in results{
-                        let collegeName = result["COLLEGES"] as! String
+                        var aCCC = CollegeObject()
+                        
+                        let collegeName = result["COLLEGES"] as? String
                         let iconfile = result["collegeIcon"] as? PFFile
                         
-                        self.cNarray.append(collegeName)
+                        if collegeName != nil{
+                            self.cNarray.append(collegeName!)
+                            aCCC.name = collegeName!
+                        }
                         if iconfile != nil{
+                            aCCC.IconIMGFile = iconfile!
                             self.cIarray.append(iconfile!)
                         }else{
                             let img = UIImagePNGRepresentation(UIImage(named: "DefaultCollegeImg")!)
                             let pfile = PFFile(data: img!)
+                            aCCC.IconIMGFile = pfile!
+                            aCCC.Icon = UIImage(data:img!)
                             self.cIarray.append(pfile!)
 
                         }
+                        
+                        self.colleges.append(aCCC)
                         
                         self.collectionview.reloadData()
 
@@ -102,8 +115,8 @@ class SuggestedCollegesVC: UIViewController, UICollectionViewDataSource, UIColle
         
         let index = collectionview.indexPathForCell(cell)!
         
-        vcv.icon = self.AIarray[index.row]
-        vcv.aCollege = cNarray[index.row]
+        vcv.icon = self.colleges[index.row].Icon//self.AIarray[index.row]
+        vcv.aCollege = self.colleges[index.row].name//cNarray[index.row]
         }
     }
     

@@ -23,6 +23,8 @@ class myCollegesContainer: UIViewController, UICollectionViewDataSource, UIColle
     var iconIMGS = [UIImage]()
     var fColleges = [String]()
     var hasIMG = [Bool]()
+    var colleges = [CollegeObject]()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -78,7 +80,9 @@ class myCollegesContainer: UIViewController, UICollectionViewDataSource, UIColle
                         print("IN")
 //                        let peta = result.objectForKey("ShipIt") as! String
 //                        if peta == "yes"{
-                        let aCollegeName = result["COLLEGES"] as! String
+                        var aCC = CollegeObject()
+                        
+                        let aCollegeName = result["COLLEGES"] as? String
                         // do images too
                         let test = result["onCTW"] as? Bool
                         
@@ -86,10 +90,14 @@ class myCollegesContainer: UIViewController, UICollectionViewDataSource, UIColle
                         
                         let icon = result["collegeIcon"] as? PFFile
                         
-                        self.myColleges.append(aCollegeName)
-                        
+                        if aCollegeName != nil{
+                            aCC.name = aCollegeName!
+                            self.myColleges.append(aCollegeName!)
+
+                        }
                         if icon != nil{
                             self.myIcons.append(icon!)
+                            aCC.IconIMGFile = icon!
                             print(icon!)
                         }else{
                             print("theres a problem, no IMG")
@@ -97,6 +105,8 @@ class myCollegesContainer: UIViewController, UICollectionViewDataSource, UIColle
                             let defidata = UIImageJPEGRepresentation(UIImage(named: "DefaultCollegeImg")!, 1.0)
                             let file = PFFile(data: defidata!)
                             self.myIcons.append(file!)
+                            aCC.IconIMGFile = file!
+
                             
                         }
                         
@@ -104,6 +114,11 @@ class myCollegesContainer: UIViewController, UICollectionViewDataSource, UIColle
                         print(test)
                         }else{print("No BOOL onCTW")}
                         print(aCollegeName)
+                        
+                        
+                        
+                        self.colleges.append(aCC)
+                        
                         
 //                        }
                     }
@@ -120,6 +135,7 @@ class myCollegesContainer: UIViewController, UICollectionViewDataSource, UIColle
     
     
     func findIT(){
+        colleges.removeAll()
         myIcons.removeAll()
         myColleges.removeAll()
         iconIMGS.removeAll()
@@ -161,7 +177,7 @@ class myCollegesContainer: UIViewController, UICollectionViewDataSource, UIColle
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return myColleges.count
+        return colleges.count//myColleges.count
     }
     
     
@@ -169,20 +185,24 @@ class myCollegesContainer: UIViewController, UICollectionViewDataSource, UIColle
         let cell : myCcell = collectionView.dequeueReusableCellWithReuseIdentifier("myCcell", forIndexPath: indexPath) as! myCcell
         
         let cName = cell.viewWithTag(1) as! UILabel
-        cName.text = "\(myColleges[indexPath.row])"
-
+        
+        if colleges[indexPath.row].name != nil{
+            cName.text = colleges[indexPath.row].name! //"\(myColleges[indexPath.row])"
+        }
         
         if (indexPath.row < myIcons.count){
             print("your good")
-            let icon = myIcons[indexPath.row]
-            icon.getDataInBackgroundWithBlock ({ (theData:NSData?, error:NSError?) -> Void in
-                
-                let image : UIImage = UIImage(data: theData!)!
-                let imgview = cell.viewWithTag(2) as! UIImageView
-                imgview.image = image
-                self.iconIMGS.append(image)
-            })
-
+            if colleges[indexPath.row].IconIMGFile != nil{
+                let icon = colleges[indexPath.row].IconIMGFile!//myIcons[indexPath.row]
+                icon.getDataInBackgroundWithBlock ({ (theData:NSData?, error:NSError?) -> Void in
+                    
+                    let image : UIImage = UIImage(data: theData!)!
+                    let imgview = cell.viewWithTag(2) as! UIImageView
+                    imgview.image = image
+                    self.iconIMGS.append(image)
+                    self.colleges[indexPath.row].Icon = image
+                })
+            }
         }else{
             print("HOLY SHIT")
             self.iconIMGS.append(UIImage(named: "DefaultCollegeImg")!)
@@ -205,8 +225,8 @@ class myCollegesContainer: UIViewController, UICollectionViewDataSource, UIColle
         
 
         
-        ti.aCollege = "\(myColleges[indexPath!.row])"
-        ti.icon = iconIMGS[indexPath!.row]
+        ti.aCollege = colleges[indexPath!.row].name  //"\(myColleges[indexPath!.row])"
+        ti.icon = colleges[indexPath!.row].Icon  //iconIMGS[indexPath!.row]
         
 //        if myIcons[indexPath!.row] = {
         //ti.beef = myIcons[indexPath!.row]

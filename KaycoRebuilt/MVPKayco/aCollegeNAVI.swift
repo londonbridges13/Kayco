@@ -17,8 +17,13 @@ class aCollegeNAVI: UINavigationController {
         super.viewDidLoad()
         UINavigationBar.appearance().tintColor = UIColor.whiteColor()
         
+//        navigationBar.titleTextAttributes = [NSFontAttributeName: UIFont(name: "Helvetica", size: 10)!]
+
+        
         navigationBar.titleTextAttributes = [NSForegroundColorAttributeName : UIColor.whiteColor()]
         
+//        self.navigationController!.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Helvetica", size: 17)!]
+
 //        view.roundCorners([.TopLeft , .TopRight], radius: 10)
         
 //        naviBar.layer.cornerRadius = 13

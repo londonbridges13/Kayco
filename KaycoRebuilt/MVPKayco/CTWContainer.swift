@@ -15,6 +15,9 @@ class CTWContainer: UIViewController, UICollectionViewDataSource, UICollectionVi
     var iconFiles = [PFFile]()
     var iconIMGS = [UIImage]()
     
+    var colleges = [CollegeObject]()
+    
+    
     @IBOutlet var actINDI: UIActivityIndicatorView!
     
     override func viewDidLoad() {
@@ -43,7 +46,8 @@ class CTWContainer: UIViewController, UICollectionViewDataSource, UICollectionVi
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return ctwArray.count   // number buddy
+//        return ctwArray.count   // number buddy
+        return colleges.count
     }
     
     
@@ -56,20 +60,20 @@ class CTWContainer: UIViewController, UICollectionViewDataSource, UICollectionVi
         cell.layer.masksToBounds = true
         
         let cName = cell.viewWithTag(1) as! UILabel
-        cName.text = ctwArray[indexPath.row]
+        cName.text = colleges[indexPath.row].name!//ctwArray[indexPath.row]
         
-        let icon = iconFiles[indexPath.row]
-        icon.getDataInBackgroundWithBlock ({ (theData:NSData?, error:NSError?) -> Void in
-//            if error == nil{
-//                print(error?.description)
-//            }else{
+        if colleges[indexPath.row].IconIMGFile != nil{
+            let icon = colleges[indexPath.row].IconIMGFile!//iconFiles[indexPath.row]
+            icon.getDataInBackgroundWithBlock ({ (theData:NSData?, error:NSError?) -> Void in
+                
                 let image : UIImage = UIImage(data: theData!)!
                 let imgview = cell.viewWithTag(2) as! UIImageView
                 imgview.image = image
                 self.iconIMGS.append(image)
-//            }
-        })
-        
+                self.colleges[indexPath.row].Icon = image
+                //            }
+            })
+        }
         
         return cell
     }
@@ -86,19 +90,27 @@ class CTWContainer: UIViewController, UICollectionViewDataSource, UICollectionVi
             if error == nil{
                 if let results = results as [PFObject]?{
                     for result in results{
-                        let collegeName = result["collegeName"] as! String
+                        var aCollege = CollegeObject()
+                        
+                        let collegeName = result["collegeName"] as? String
                         let icon = result["collegeIcon"] as? PFFile
                         
-                        
-                        self.ctwArray.append(collegeName)
-                        print(collegeName)
+                        if collegeName != nil{
+                            aCollege.name = collegeName!
+                            self.ctwArray.append(collegeName!)
+                            print(collegeName)
+
+                        }
                         
                         if icon != nil{
+                            aCollege.IconIMGFile = icon
                             self.iconFiles.append(icon!)
                             print(icon)
                         }else{print("NO ICON")}
                         
                         
+                        self.colleges.append(aCollege)
+
                     }
                 }
             }
@@ -127,9 +139,11 @@ class CTWContainer: UIViewController, UICollectionViewDataSource, UICollectionVi
         
         
         
-        ti.aCollege = "\(ctwArray[indexPath!.row])"
-        ti.icon = self.iconIMGS[indexPath!.row]
-        ti.beef = self.iconFiles[indexPath!.row]
+        ti.aCollege = self.colleges[indexPath!.row].name//"\(ctwArray[indexPath!.row])"
+        ti.icon = self.colleges[indexPath!.row].Icon//self.iconIMGS[indexPath!.row]
+        ti.beef = self.colleges[indexPath!.row].IconIMGFile//self.iconFiles[indexPath!.row]
+        
+        
         
     }
     
